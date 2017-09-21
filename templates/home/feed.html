@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+
+<div class="container-fluid">
+
+	{% if user.is_authenticated %}
+		<form action="" method="POST" enctype="multipart/form-data">
+		<div class="form-group">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<p></p><input type="submit" class="btn btn-default" value="Post" />
+		</div>
+		</form>
+	{% else %}
+		<a href="register/" class="btn btn-primary btn-lg"><strong>Register</strong> to customize your feed!</a>
+	{% endif %}
+
+	{% for content in feed reversed %}
+		{% if content in reviews %}
+			<div class="review">
+				@<a href="{% url 'home:member' content.user.username %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<h4><a href="{% url 'car' make=content.car.make years=content.car.years %}">{{ content.car.make }} {{ content.car.version }} ({{ content.car.years_sold }})</a></h4>
+				<p><kbd>{{ content.rating }}/10</kbd> <i>{{ content.title }}</i></p>
+			</div>
+		{% elif content in listings %}
+			<div class="listing">
+				@<a href="{% url 'home:member' content.user.username %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<h4><a href="{% url 'car-listing' make=content.car.make years=content.car.years listing_id=content.id %}">{{ content.title }}</a></h4>
+				<p><kbd>{{ content.year }} {{ content.car.make }} {{ content.car.version }}</kbd> {{ content.mileage }} km, ${{ content.price|intcomma }}</p>
+				<p></p>
+			</div>
+		{% elif content in opinions %}
+			<div class="opinion">
+				@<a href="{% url 'home:member' content.user.username %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<img src="/{{ content.photo }}" class="img-responsive" width="980px">
+				<p>{{ content.text|linebreaks }}</p>
+				
+				<form action="{% url 'home:opinion-vote' username=content.user.username opinion_id=content.id %}" method="GET" {% if user == content.user or not user.is_authenticated %}onclick="return false;"{% endif %}>
+				<div class="form-group" style="background-color: rgba(17,17,17,0.1)">
+		    		<button type="submit" class="glyphicon glyphicon-thumbs-up" name="vote-up"></button>
+		    		{% if content.vote_score > 0 %}
+		    			<strong style="color: green">{{ content.vote_score }}</strong>
+		    		{% elif content.vote_score < 0 %}
+		    			<strong style="color: red">{{ content.vote_score }}</strong>
+		    		{% endif %}
+		    		<button type="submit" class="glyphicon glyphicon-thumbs-down" name="vote-down"></button>
+		    	</div>
+				</form>
+			</div>				
+		{% endif %}
+	{% endfor %}
+
+</div>
+
+	
+{% endblock %}

@@ -1,0 +1,108 @@
+.navbar-header {
+	font-family: Syncopate, sans-serif;
+	font-weight: 700;
+}
+
+
+.navbar {
+	border-radius: 0;
+}
+
+
+.car-title {
+    color: white;
+    background-color: rgba(17,17,17,0.5);
+    padding: 15px;
+    text-align: center;
+    max-width: 980px;
+    margin-right: 15px;
+    margin-top: 0px;
+    position: absolute;
+}
+
+
+.member-title {
+    color: white;
+    background-color: rgba(17,17,17,0.5);
+    padding: 10px 15px;
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+
+
+.review {
+	border-left: 6px solid orange;
+    background-color: rgba(17,17,17,0.05);
+	margin: 10px 0 15px 0;
+	padding: 10px 10px 1px 10px;
+}
+
+.review h3 {
+	margin-top: -3px;
+    display: inline;
+}
+
+
+.listing {
+    border-left: 6px solid rgb(16, 98, 122);
+    background-color: rgba(17,17,17,0.05);
+    margin: 10px 0 15px 0;
+    padding: 10px 10px 1px 10px;
+}
+
+
+.opinion {
+    border-left: 6px solid rgb(150, 0, 24);
+    background-color: rgba(17,17,17,0.05);
+    margin: 10px 0 15px 0;
+    padding: 10px 10px 1px 10px;
+}
+
+
+.car_icon {
+    position: relative;
+    top: 0;
+    left: -4px;
+    width: 35px;
+    height: auto;
+}
+.drive_icon {
+    position: relative;
+    top: -1px;
+    left: -5px;
+    width: 32px;
+    height: auto;
+}
+.star_icon {
+    position: relative;
+    top: -4px;
+    width: 22px;
+    height: auto;
+}
+.dollar_icon {
+    position: relative;
+    top: -4px;
+    width: 22px;
+    height: auto;
+}
+
+
+.glyphicon.glyphicon-thumbs-up:hover {
+  color: green;
+}
+.glyphicon.glyphicon-thumbs-down:hover {
+  color: red;
+}
+
+
+.btn-responsive {
+    white-space: normal !important;
+    word-wrap: break-word;
+}
+
+
+@media only screen and (max-width: 600px) {
+   h1 { 
+      font-size: 1.8em; 
+   }
+}

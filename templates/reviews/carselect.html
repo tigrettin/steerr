@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Reviews | STEERR{% endblock %}
+{% block reviews_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+	{% if make %}
+		<p><strong>Make:</strong> {{ make }}</p>
+	{% endif %}
+
+	{% if model %}
+		<p><strong>Model:</strong> {{ model }}</p>
+	{% endif %}
+
+	{% if platform %}
+		<p><strong>Platform:</strong> {{ platform }}</p>
+	{% endif %}
+
+	{% if body %}
+		<p><strong>Body:</strong> {{ body }}</p>
+	{% endif %}
+
+	{% if version %}
+		<p><strong>Version:</strong> {{ version }}</p>
+	{% endif %}
+
+	{% if years %}
+		<p><strong>Years:</strong> {{ years }}</p>
+	{% endif %}
+
+	<form action="" method="GET">
+	    <input type="hidden" name="submitted" value="1" />
+	    {{ form.as_p }}
+	    <input type="submit" class="btn btn-default" value="Select" />
+	</form>
+
+	<h2>Latest Reviews
+	{% if version %} for <a href="{% url 'marketplace:years-select' make=make model=model platform=platform body=body version=version %}">{{ make }} {{ version }}</a>
+	{% elif body %} for <a href="{% url 'marketplace:version-select' make=make model=model platform=platform body=body %}">{{ make }} {{ body }}</a>
+	{% elif platform %} for <a href="{% url 'marketplace:body-select' make=make model=model platform=platform %}">{{ make }} {{ platform }}</a>
+	{% elif model %} for <a href="{% url 'marketplace:platform-select' make=make model=model %}">{{ make }} {{model }}</a>
+	{% elif make %} for <a href="{% url 'marketplace:model-select' make %}">{{ make }}</a>	
+	{% endif %}</h2>
+
+	{% if not reviews %}
+		<div class="review"><p><i>There are no reviews for this car yet.</i></p></div>
+	{% endif %}
+
+	{% for review in reviews %}
+		<div class="review">
+			@<a href="{% url 'home:member' review.user.username %}">{{ review.user }}</a> ({{ review.created.date }})<br>
+			<h4><a href="{% url 'car' make=review.car.make years=review.car.years %}">{{ review.car.make }} {{ review.car.version }} ({{ review.car.years_sold }})</a></h4>
+			<p><kbd>{{ review.rating }}/10</kbd> <i>{{ review.title }}</i></p>
+		</div>
+	{% endfor %}
+
+</div>
+
+{% endblock %}

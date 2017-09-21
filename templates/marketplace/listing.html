@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ listing.title }} | STEERR{% endblock %}
+{% block marketplace_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+<h1 class="car-title">{{ listing.title }}</h1>
+
+<img src="/{{ listing.photo }}" class="img-responsive" max-width="980px">
+
+	<div class="row">
+		<div class="col-md-6" style="background-color: rgb(16, 98, 122)">
+			<p></p><p style="text-align: center;"><a href="{% url 'car' make=listing.car.make years=listing.car.years %}" class="btn btn-info btn-responsive" style="font-size: 20px;">{{ listing.car }}</a></p>
+
+			<div class="col-md-6">
+			<ul class="list-group">
+				<li class="list-group-item"><strong>Price:</strong> ${{ listing.price|intcomma }}</li>
+				<li class="list-group-item"><strong>Year:</strong> {{ listing.year }} ({{ listing.get_condition_display }})</li>
+				<li class="list-group-item"><strong>Mileage:</strong> {{ listing.mileage }} km</li>
+				<li class="list-group-item"><strong>Color:</strong> {{ listing.get_color_display }}</li>
+			</ul>
+			</div>
+
+			<div class="col-md-6">
+			<ul class="list-group">
+				<li class="list-group-item"><strong>Owner:</strong> <a href="{% url 'home:member' listing.user.username %}">{{ listing.user }}</a></li>
+				<li class="list-group-item"><strong>From:</strong> {{ listing.get_seller_display }}</li>
+				<li class="list-group-item"><strong>Country:</strong> {{ listing.get_country_display }}</li>
+				<li class="list-group-item"><strong>City:</strong> {{ listing.city }}</li>
+			</ul>
+			</div>
+
+		</div>
+	</div>
+
+	<div class="listing">
+			{{ listing.description|linebreaks }}
+	</div>
+
+</div>
+{% endblock %}

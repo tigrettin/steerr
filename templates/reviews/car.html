@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ car }} | STEERR{% endblock %}
+{% block reviews_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid">
+
+	<h1 class="car-title">{{ car.make }} {{ car.version }} ({{ car.years_sold }})</h1>
+
+	{% if car_image.is_file %}
+		<img src="/static/reviews/images/{{ car }}.jpg" class="img-responsive" width="980px"><br>
+	{% else %}
+		<br><br><br><br><br>
+		<h2><a href="" class="btn btn-primary btn-lg">Suggest a picture for this car</a></h2>
+	{% endif %}
+
+	<form action="{% url 'car-subscribe' make=car.make years=car.years %}" method="GET">
+   	    {% if car not in user.subscriptions.cars.all %}
+			<button type="submit" class="btn btn-primary btn-lg" style="background-color: green" name="subscribe"><b>Subscribe</b> to this car</button>
+	    {% else %}
+			<button type="submit" class="btn btn-primary btn-md" style="background-color: crimson" name="unsubscribe">Unsubscribe from this car</button>
+	    {% endif %}
+	</form>
+
+	<br><p class="well well-small"><img src="/static/reviews/images/car_icon.png" class="car_icon">This is a <strong>{{ car.car_classification.lower }}</strong> of <strong>{{ car.body_type.lower }}</strong> body type with <strong>{% if multiple %}3 or 5{% else %}{{ doors }}{% endif %}</strong> doors and <strong>{{ seats }}</strong> seats.</p>
+
+	<p class="well well-small"><img src="/static/reviews/images/drive_icon.png" class="drive_icon">It is <strong>
+	{% if car.drivetrain == 'R' %}rear-wheel drive{% endif %}
+	{% if car.drivetrain == 'F' %}front-wheel drive{% endif %}
+	{% if car.drivetrain == 'Ap' %}all-wheel drive{% endif %}
+	</strong> and its engine is mounted <strong>
+	{% if car.engine_place == 'FL' %}longitudinally in the front.{% endif %}
+	{% if car.engine_place == 'F' %}in the front.{% endif %}
+	{% if car.engine_place == 'FQ' %}transversely in the front.{% endif %}
+	</strong></p>
+
+	<p class="well well-small"><img src="/static/reviews/images/star_icon.png" class="star_icon"> 
+	{% if car.review_set.all %}
+	Currently, there are <strong>{{ car.review_set.all|length }}</strong> review{{ car.review_set.all|pluralize }} for this car and its <a href="">STEERRating</a> is <strong style="font-size: 20px">{{ average_rating }}</strong>/10.</p>
+	{% else %}
+	There are no reviews for this car yet.</p>
+	{% endif %}
+
+	<p class="well well-small"><img src="/static/reviews/images/dollar_icon.png" class="dollar_icon"> <strong>Price</strong> range is 
+	{% if car.listing_set.all %}
+	between <strong>${{ min_price|intcomma }} – {{ max_price|intcomma }}</strong>. <a href="{% url 'car-listings' make=car.make years=car.years %}" class="btn btn-info btn-responsive" style="margin: -10px 0; padding: 3px 6px">See all listings</a></p>
+	{% else %}
+	not available as there are no <a href="{% url 'car-listings' make=car.make years=car.years %}" class="btn btn-info btn-responsive" style="margin: -10px 0; padding: 3px 6px">listings</a> for this car yet.</p>
+	{% endif %}
+
+	<div class="row">
+		<div class="col-md-4" style="background-color: rgba(255,142,30,1)">
+			<h2>Engine</h2>
+
+			<ul>
+				<li><strong>Type:</strong> 
+				{% if car.engine_type == 'Otto' %}Petrol
+				{% else %}{{ car.engine_type }}{% endif %}</li>
+				<li><strong>Displacement:</strong> 
+				{{ car.displacement_cm3 }} cm³ 
+				{% if car.supercharger == 'no' %}naturally aspirated 
+				{% else %}{{ car.supercharger.lower }}{% endif %}
+				{{ car.cylinders }}</li>
+				<li><strong>Injection:</strong> 
+				{% if not car.fuel_injection %}N/A
+				{% else %}{{ car.fuel_injection }}{% endif %}</li>
+				<li><strong>Compression ratio:</strong> 
+				{% if not car.compression_ratio %}N/A
+				{% else %}{{ car.compression_ratio }}{% endif %}</li>
+				<li><strong>Bore x stroke:</strong> 
+				{% if not car.bore_stroke_mm %}N/A
+				{% else %}{{ car.bore_stroke_mm }} mm{% endif %}</li>
+				<li><strong>Power:</strong> {{ car.power_ps }} PS ({{ car.power_kw|default_if_none:"N/A" }} kW) @ {{ car.power_rpm|default_if_none:"N/A" }} rpm</li>
+				<li><strong>Torque:</strong> {{ car.torque_nm }} Nm @ {{ car.torque_rpm|default_if_none:"N/A" }} rpm</li>
+				<li><strong>Transmission:</strong> 
+				{% if not car.manual %}N/A
+				{% elif car.manual == '-' %}No manual
+				{% else %}{{ car.manual }}-speed manual{% endif %}
+				{% if not car.automatic or car.automatic == '-' or car.automatic == 'n/a'%}
+				{% elif car.automatic == 'O' %} / automatic optional
+				{% elif car.automatic == 'CVT' %} / CVT optional
+				{% else %} / {{ car.automatic }}-speed auto{% endif %}</li>
+			</ul>
+		</div>
+
+		<div class="col-md-4" style="background-color: rgba(255,152,30,1)">
+			<h2>Performance</h2>
+
+			<ul>
+				<li><strong>0-100 km/h:</strong> {{ car.to_100_kmph_sec }} sec</li>
+				<li><strong>Top speed:</strong> {{ car.max_speed_kmh }} km/h</li>
+				<li><strong>Fuel consumption (combined):</strong> 
+				{% if not car.fuel_eff_l100km %}N/A
+				{% else %}{{ car.fuel_eff_l100km }} L/100 km{% endif %}</li>
+				<li><strong>Fuel consumption (city):</strong> 
+				{% if not car.fuel_eff_city_l100km %}N/A
+				{% else %}{{ car.fuel_eff_city_l100km }} L/100 km{% endif %}</li>
+				<li><strong>Fuel consumption (highway):</strong> 
+				{% if not car.fuel_eff_highway %}N/A
+				{% else %}{{ car.fuel_eff_highway }} L/100 km{% endif %}</li>
+				<li><strong>CO₂ emissions:</strong> 
+				{% if not car.co2_gkm or car.co2_gkm == '-' %}N/A
+				{% else %}{{ car.co2_gkm }} g/km{% endif %}</li>
+				<li><strong>Efficiency class:</strong> 
+				{% if not car.co2_efficiency_class or car.co2_efficiency_class == '-' %}N/A
+				{% else %}{{ car.co2_efficiency_class }}{% endif %}</li>
+				<li><strong>Pollution class:</strong> 
+				{% if not car.pollution_class or car.pollution_class == '-' %}N/A
+				{% else %}{{ car.pollution_class }}{% endif %}</li>
+			</ul>
+		</div>
+
+		<div class="col-md-4" style="background-color: rgba(255,162,30,1)">
+			<h2>Body</h2>
+
+			<ul>
+				<li><strong>Length:</strong> {{ car.length_mm }} mm</li>
+				<li><strong>Width:</strong> {{ car.width_mm }} mm</li>
+				<li><strong>Height:</strong> {{ car.height_mm }} mm</li>
+				<li><strong>Curb weight:</strong> 
+				{% if not car.curb_weight_kg %}N/A
+				{% else %}{{ car.curb_weight_kg }} kg{% endif %}</li>
+				<li><strong>Trunk space:</strong> 
+				{% if not car.cargo_space_litres or car.cargo_space_litres == 'n/a' %}N/A
+				{% else %}{{ car.cargo_space_litres }} litres{% endif %}</li>
+				<li><strong>Fuel tank:</strong> 
+				{% if not car.gas_tank_litres %}N/A
+				{% else %}{{ car.gas_tank_litres }} litres{% endif %}</li>
+				<li><strong>Turning circle:</strong> 
+				{% if not car.turning_circle_m %}N/A
+				{% else %}{{ car.turning_circle_m }} m{% endif %}</li>
+				
+				{% if not car.tire_size_rear %}
+					<li><strong>Tire size:</strong> {{ car.tire_size|default_if_none:"N/A" }}</li>
+				{% else %}
+					<li><strong>Front tire size:</strong> {{ car.tire_size|default_if_none:"N/A" }}</li>
+					<li><strong>Rear tire size:</strong> {{ car.tire_size_rear|default_if_none:"N/A" }}</li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+
+<h2>Reviews</h2>
+
+{% if user.is_authenticated %}
+	{% if user.id in review_users %}
+		<p>You have reviewed this car.</p><br>
+	{% else %}
+		Share <strong>your</strong> impressions!<br><br>
+
+		<form action="" method="POST" enctype="multipart/form-data">
+		<div class="form-group">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<p></p><input type="submit" class="btn btn-default" value="Post" />
+		</div>
+		</form><br>
+	{% endif %}
+{% else %}
+	<p><a href="{% url 'home:register' %}" class="btn btn-default">Register or login</a> and share <strong>your</strong> impressions!</p><br>
+{% endif %}
+
+{% if reviews %}
+	{% if not sort %}
+		<p><a href="{% url 'car-sort' make=car.make years=car.years sort='best' %}"><button type="button" class="btn btn-primary btn-sm">Sort by Best</button></a></p>
+	{% elif sort == 'best' %}
+		<p><a href="{% url 'car' make=car.make years=car.years %}"><button type="button" class="btn btn-primary btn-sm">Sort by Latest</button></a></p>
+	{% endif %}
+{% endif %}
+
+{% for review in reviews %}
+	<div class="review">
+		<h3>{{ review.title }}</h3> @<a href="{% url 'home:member' review.user.username %}">{{ review.user }}</a> ({{ review.created.date }})<br>
+		<p><kbd>{{ review.rating }}/10</kbd></p>
+		<p>{{ review.text|linebreaks }}</p>
+		
+		<form action="{% url 'review-vote' review_id=review.id make=car.make years=car.years %}" method="GET" {% if user == review.user or not user.is_authenticated %}onclick="return false;"{% endif %}>
+		<div class="form-group" style="background-color: rgba(17,17,17,0.1)">
+	    	<button type="submit" class="glyphicon glyphicon-thumbs-up" name="vote-up"></button>
+	    	{% if review.vote_score > 0 %}
+	    		<strong style="color: green">{{ review.vote_score }}</strong>
+	    	{% elif review.vote_score < 0 %}
+	    		<strong style="color: red">{{ review.vote_score }}</strong>
+	    	{% endif %}
+	    	<button type="submit" class="glyphicon glyphicon-thumbs-down" name="vote-down"></button>
+	    </div>
+		</form>
+	</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

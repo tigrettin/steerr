@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.generic import View
@@ -7,6 +8,7 @@ from marketplace.models import Listing
 from reviews.models import Review
 from .forms import UserForm, OpinionForm
 from .models import Opinion, Subscriptions
+
 
 
 def feed(request):
@@ -72,6 +74,42 @@ def opinion_vote(request, username, opinion_id):
 		return redirect("home:member", member.username)
 	else:
 		return redirect("home:feed")
+
+
+def opinion_update(request, username, opinion_id):
+	member = User.objects.get(username=username)
+	opinion = Opinion.objects.get(id=opinion_id)
+
+	form = OpinionForm(request.POST or None, request.FILES or None, instance=opinion)
+	if form.is_valid():
+		form.save()
+		return redirect("home:member", member.username)
+
+	context = {
+	"member": member,
+	"form": form
+	}
+
+	return render(request, "home/opinion.html", context)
+
+
+def opinion_confirm(request, username, opinion_id):
+	member = User.objects.get(username=username)
+	opinion = Opinion.objects.get(id=opinion_id)
+
+	context = {
+	"member": member,
+	"opinion": opinion
+	}
+
+	return render(request, "home/confirmation.html", context)
+
+
+def opinion_delete(request, username, opinion_id):
+	member = User.objects.get(username=username)
+	Opinion.objects.filter(id=opinion_id).delete()
+	messages.success(request, 'Opinion deleted.')
+	return redirect("home:member", member.username)
 
 
 class UserFormView(View):

@@ -29,6 +29,15 @@
 		</form>
 	{% endif %}
 
+	{% if messages %}
+    	{% for message in messages %}
+    		<div{% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissable"{% endif %}>
+    			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+ 				{{ message }}
+			</div>
+   		{% endfor %}
+	{% endif %}
+
 	{% for content in feed reversed %}
 		{% if content in reviews %}
 			<div class="review">
@@ -45,8 +54,14 @@
 			</div>
 		{% elif content in opinions %}
 			<div class="opinion">
-				@<a href="">{{ content.user }}</a> ({{ content.created.date }})<br>
-				<img src="/{{ content.photo }}" class="img-responsive" width="980px">
+				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
+				{% if user == member or user.is_superuser %}
+					<a href="{% url 'home:opinion-update' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-pencil"  style="color:darkorange"></button></a>
+					<a href="{% url 'home:opinion-confirm' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-remove" style="color:crimson"></button></a>
+				{% endif %}<br>
+				<div id="images">
+					<img src="/{{ content.photo }}" class="img-responsive" style="max-width:100%">
+				</div>
 				<p>{{ content.text|linebreaks }}</p>
 				
 				<form action="{% url 'home:opinion-vote' username=content.user.username opinion_id=content.id %}" method="GET" {% if user == content.user or not user.is_authenticated %}onclick="return false;"{% endif %}>

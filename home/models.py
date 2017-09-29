@@ -26,7 +26,7 @@ class Opinion(VoteModel, models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	text = models.TextField()
 	photo = models.ImageField(upload_to="static/home/images/", null=True, blank=True, validators=[file_size])
-	created = models.DateTimeField(editable=False)
+	created = models.DateTimeField()
 	modified = models.DateTimeField()
 
 	def save(self, *args, **kwargs):

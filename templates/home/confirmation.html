@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ member }} | STEERR{% endblock %}
+{% block body %}
+
+<div class="container-fluid">
+
+	{% if user == member or user.is_superuser %}
+		<div class="opinion">
+			@<a href="{% url 'home:member' member %}">{{ opinion.user }}</a> ({{ opinion.created.date }})<br>
+			<img src="/{{ content.photo }}" class="img-responsive" style="width: 100%; max-width: 980px;">
+			<p>{{ opinion.text|linebreaks }}</p>
+			<div class="alert alert-danger">
+  				Are you sure that you want to permanently delete this opinion? <a href="{% url 'home:opinion-delete' username=member.username opinion_id=opinion.id %}" class="alert-link">Yes</a> / <a href="{% url 'home:member' member.username %}" class="alert-link">No</a>
+			</div>
+		</div>
+
+	{% else %}
+		<div class="alert alert-danger">
+  			You don't have permission to delete this opinion. <a href="{% url 'home:member' member.username %}" class="alert-link">Visit {{ member }}'s profile</a>
+		</div>
+	{% endif %}
+
+{% endblock %}

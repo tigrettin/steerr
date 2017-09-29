@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ member }} | STEERR{% endblock %}
+{% block body %}
+
+<div class="container-fluid">
+
+	{% if user == member or user.is_superuser %}
+		<form action="" method="POST" enctype="multipart/form-data">
+		<div class="form-group">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<p></p><input type="submit" class="btn btn-default" value="Post" />
+		</div>
+		</form>
+	{% else %}
+		<div class="alert alert-warning">
+  			You don't have permission to edit this opinion. <a href="{% url 'home:member' member %}" class="alert-link">Visit {{ member }}'s profile</a>
+		</div>
+	{% endif %}
+
+{% endblock %}

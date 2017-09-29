@@ -31,7 +31,7 @@
 
 
 .review {
-	border-left: 6px solid orange;
+	border-left: 6px solid rgb(255, 165, 0);
     background-color: rgba(17,17,17,0.05);
 	margin: 10px 0 15px 0;
 	padding: 10px 10px 1px 10px;
@@ -98,6 +98,11 @@
 .btn-responsive {
     white-space: normal !important;
     word-wrap: break-word;
+}
+
+
+#images {
+    max-width: 1024px;
 }
 
 

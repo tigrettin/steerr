@@ -36,7 +36,9 @@
 		{% elif content in opinions %}
 			<div class="opinion">
 				@<a href="{% url 'home:member' content.user.username %}">{{ content.user }}</a> ({{ content.created.date }})<br>
-				<img src="/{{ content.photo }}" class="img-responsive" width="980px">
+				<div id="images">
+					<img src="/{{ content.photo }}" class="img-responsive" style="max-width:100%">
+				</div>
 				<p>{{ content.text|linebreaks }}</p>
 				
 				<form action="{% url 'home:opinion-vote' username=content.user.username opinion_id=content.id %}" method="GET" {% if user == content.user or not user.is_authenticated %}onclick="return false;"{% endif %}>

@@ -21,15 +21,15 @@ def feed(request):
 	else:
 		reviews_subs = []
 		for review in reviews:
-			if review.car in request.user.subscriptions.cars.all() or review.user.subscriptions in request.user.subscriptions.members.all():
+			if review.car in request.user.subscriptions.cars.all() or review.user.subscriptions in request.user.subscriptions.members.all() or review.user==request.user:
 				reviews_subs.append(review)
 		listings_subs = []
 		for listing in listings:
-			if listing.car in request.user.subscriptions.cars.all() or listing.user.subscriptions in request.user.subscriptions.members.all():
+			if listing.car in request.user.subscriptions.cars.all() or listing.user.subscriptions in request.user.subscriptions.members.all() or listing.user==request.user:
 				listings_subs.append(listing)
 		opinions_subs = []
 		for opinion in opinions:
-			if opinion.user.subscriptions in request.user.subscriptions.members.all():
+			if opinion.user.subscriptions in request.user.subscriptions.members.all() or opinion.user==request.user:
 				opinions_subs.append(opinion)
 			else:
 				for car in request.user.subscriptions.cars.all():

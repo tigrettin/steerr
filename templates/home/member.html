@@ -56,11 +56,11 @@
 			<div class="opinion">
 				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
 				{% if user == member or user.is_superuser %}
-					<a href="{% url 'home:opinion-update' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-pencil"  style="color:darkorange"></button></a>
-					<a href="{% url 'home:opinion-confirm' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-remove" style="color:crimson"></button></a>
+					<a href="{% url 'home:opinion-update' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:opinion-confirm' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-remove" style="color: crimson"></button></a>
 				{% endif %}<br>
 				<div id="images">
-					<img src="/{{ content.photo }}" class="img-responsive" style="max-width:100%">
+					<img src="/{{ content.photo }}" class="img-responsive" style="max-width: 100%">
 				</div>
 				<p>{{ content.text|linebreaks }}</p>
 				
@@ -71,7 +71,7 @@
 		    		{% if content.vote_score > 0 %}
 		    			<strong style="color: green">{{ content.vote_score }}</strong>
 		    		{% elif content.vote_score < 0 %}
-		    			<strong style="color: red">{{ content.vote_score }}</strong>
+		    			<strong style="color: crimson">{{ content.vote_score }}</strong>
 		    		{% endif %}
 		    		<button type="submit" class="glyphicon glyphicon-thumbs-down" name="vote-down"></button>
 		    	</div>

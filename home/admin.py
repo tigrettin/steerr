@@ -1,7 +1,12 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import Subscriptions, Opinion
+from .models import Profile, Subscriptions, Opinion
+
+
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
 
 
 class SubscriptionsInline(admin.StackedInline):
@@ -11,7 +16,7 @@ class SubscriptionsInline(admin.StackedInline):
 
 
 class CustomUserAdmin(UserAdmin):
-    inlines = (SubscriptionsInline, )
+    inlines = (SubscriptionsInline, ProfileInline,)
 
 
 admin.site.unregister(User)

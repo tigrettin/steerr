@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ member }} | STEERR{% endblock %}
+{% block body %}
+
+<div class="container-fluid"><p></p>
+
+	{% if user == member or user.is_superuser %}
+		<form action="" method="POST" enctype="multipart/form-data">
+		<div class="form-group">
+			{% csrf_token %}
+
+			{% for field in form %}
+				<p>
+				{{ field.errors }}
+		        {{ field.label_tag }}
+		        {% if 'Photo' in field.label and category == 'opinions' %}
+		        	{% if field.value %}
+			            <br><img src="/{{ field.value.url }}" class="img-fluid"></img><p></p>
+		            	<input type="checkbox" name="photo-clear" id="photo-clear_id" />
+						<label for="photo-clear_id">Clear current</label><br>
+						Change:
+						<input type="file" name="photo" id="id_photo" />
+					{% else %}
+						{{ field }}
+					{% endif %}
+				{% elif 'Photo' in field.label and 'listings' in category%}
+		        	{% if field.value %}
+			            <br><img src="/{{ field.value.url }}" class="img-fluid"></img><p></p>
+		            	<input type="checkbox" name="{{ field.label.lower}}-clear" id="{{ field.label.lower}}-clear_id" />
+						<label for="photo-clear_id">Clear current</label><br>
+						Change:
+						<input type="file" name="photo" id="id_photo" />
+					{% else %}
+						{{ field }}
+					{% endif %}
+		        {% else %}
+		        	{{ field }}
+		        {% endif %}
+		    	</p>
+		    {% endfor %}
+
+			<p></p><input type="submit" class="btn btn-primary" value="Update" />
+		</div>
+		</form>		
+	{% else %}
+		<div class="alert alert-warning">
+  			You don't have permission to edit this content. <a href="{% url 'home:member' member %}" class="alert-link">Visit {{ member }}'s profile</a>
+		</div>
+	{% endif %}
+
+{% endblock %}

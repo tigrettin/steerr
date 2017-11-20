@@ -5,21 +5,87 @@
 {% block title %}{{ member }} | STEERR{% endblock %}
 {% block body %}
 
-<div class="container-fluid">
+<div class="container-fluid"><p></p>
 
 	{% if user == member or user.is_superuser %}
-		<div class="opinion">
-			@<a href="{% url 'home:member' member %}">{{ opinion.user }}</a> ({{ opinion.created.date }})<br>
-			<img src="/{{ content.photo }}" class="img-responsive" style="width: 100%; max-width: 980px;">
-			<p>{{ opinion.text|linebreaks }}</p>
-			<div class="alert alert-danger">
-  				Are you sure that you want to permanently delete this opinion? <a href="{% url 'home:opinion-delete' username=member.username opinion_id=opinion.id %}" class="alert-link">Yes</a> / <a href="{% url 'home:member' member.username %}" class="alert-link">No</a>
-			</div>
-		</div>
+		{% if category == 'opinions' %}
+			<div class="opinion">
+				@<a href="{% url 'home:member' member %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				
+				{% if content.photo %}
+					<!-- Trigger the Modal -->
+					<p style="margin-top: -10px"><div id="images-feed">
+						<img id="{{ content.id }}" src="/{{ content.photo }}" class="img-fluid" alt="" max-width="100%">
+					</div></p>
 
+					<!-- The Modal -->
+					<div id="myModal" class="modal">
+
+					  <!-- The Close Button -->
+					  <span class="close-image">&times;</span>
+
+					  <!-- Modal Content (The Image) -->
+					  <img class="modal-content" id="img01">
+
+					  <!-- Modal Caption (Image Text) -->
+					  <div id="caption"></div>
+					</div>
+				{% endif %}
+
+				<script>
+					// Get the modal
+					var modal = document.getElementById('myModal');
+
+					// Get the image and insert it inside the modal - use its "alt" text as a caption
+					var img = document.getElementById('{{ content.id }}');
+					var modalImg = document.getElementById("img01");
+					var captionText = document.getElementById("caption");
+					img.onclick = function(){
+					    modal.style.display = "block";
+					    modalImg.src = this.src;
+					    captionText.innerHTML = this.alt;
+					}
+
+					// Get the <span> element that closes the modal
+					var span = document.getElementsByClassName("close-image")[0];
+
+					// When the user clicks on <span> (x), close the modal
+					span.onclick = function() { 
+					  modal.style.display = "none";
+					}
+				</script>
+
+				<p>{{ content.text|linebreaks }}</p>
+		{% elif category == 'reviews' %}
+			<div class="review">
+				<h5>{{ content.title }}</h5> @<a href="{% url 'home:member' member %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<p><kbd>{{ content.rating }}/10</kbd></p>
+				<p>{{ content.text|linebreaks }}</p>
+		{% elif category == 'reviews_us' %}
+			<div class="review">
+				<h3>{{ content.title }}</h3> @<a href="{% url 'home:member' member %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<p><kbd>{{ content.rating }}/10</kbd></p>
+				<p>{{ content.text|linebreaks }}</p>
+		{% elif category == 'listings' %}
+			<div class="listing">
+				@<a href="{% url 'home:member' member %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<h4><a href="{% url 'marketplace:car-listing' make=content.car.make years=content.car.years body_type=content.car.body_type listing_id=content.id %}">{{ content.title }}</a></h4>
+				<p><kbd>{{ content.year }} {{ content.car.make }} {{ content.car.version }}</kbd></p>
+				<p><span class="fa fa-road" aria-hidden="true"></span>{{ content.mileage }} km <span class="fa fa-euro" aria-hidden="true"></span>{{ content.price|intcomma }}</p>
+		{% elif category == 'listings_us' %}
+			<div class="listing">
+				@<a href="{% url 'home:member' member %}">{{ content.user }}</a> ({{ content.created.date }})<br>
+				<h4><a href="{% url 'marketplace:car-listing-us' make=content.car.make model=content.car.model trim=content.car.trim version=content.car.version year=content.car.year listing_id=content.id %}">{{ content.title }}</a></h4>
+				<p><kbd>{{ content.car.year }} {{ content.car.make }} {{ content.car.trim }}</kbd></p>
+				<p><span class="fa fa-road" aria-hidden="true"></span>{{ content.mileage }} mi <span class="fa fa-usd" aria-hidden="true"></span>{{ content.price|intcomma }}</p>
+		{% endif %}
+				<div class="alert alert-danger">
+	  				Are you sure that you want to permanently delete this? <a href="{% url 'home:content-delete' username=member.username category=category content_id=content.id %}" class="alert-link">Yes</a> / <a href="{% url 'home:member' member.username %}" class="alert-link">No</a>
+				</div>
+		</div>
 	{% else %}
 		<div class="alert alert-danger">
-  			You don't have permission to delete this opinion. <a href="{% url 'home:member' member.username %}" class="alert-link">Visit {{ member }}'s profile</a>
+  			You don't have permission to delete this content. <a href="{% url 'home:member' member.username %}" class="alert-link">Visit {{ member }}'s profile</a>
 		</div>
 	{% endif %}
 

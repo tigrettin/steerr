@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Reviews | STEERR{% endblock %}
+{% block reviews_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid"><p></p>
+
+	{% if not make %}
+		<div class="card">
+			<div class="card-body">
+				<img src="/static/reviews/images/us_flag.png" class="us_flag"> For American cars <a href="{% url 'reviews:make-select-us' %}">click here</a>.
+			</div>
+		</div>
+	{% endif %}
+
+	<ul class="list-group">
+
+		{% if make %}
+			<li class="list-group-item">
+				<strong>Make:</strong> {{ make }}
+			</li>
+		{% endif %}
+
+		{% if model %}
+			<li class="list-group-item">
+				<strong>Model:</strong> {{ model }}
+			</li>
+		{% endif %}
+
+		{% if platform %}
+			<li class="list-group-item">
+				<strong>Platform:</strong> {{ platform }}
+			</li>
+		{% endif %}
+
+		{% if body_type %}
+			<li class="list-group-item">
+				<strong>Body:</strong> {{ body_type }}
+			</li>
+		{% endif %}
+
+		{% if version %}
+			<li class="list-group-item">
+				<strong>Version:</strong> {{ version }}
+			</li>
+		{% endif %}
+
+		{% if years %}
+			<li class="list-group-item">
+				<strong>Years:</strong> {{ years }}
+			</li>
+		{% endif %}
+
+	</ul>
+
+	<p></p><div class="col-sm-4" style="margin-left: -15px">
+		<form action="" method="GET">
+		    <input type="hidden" name="submitted" value="1" />
+		    {{ form.as_p }}
+		    <input type="submit" class="btn btn-secondary" value="Select" />
+		</form>
+	</div><p></p>
+
+	<h2>Latest Reviews
+	{% if version %} for <a href="{% url 'marketplace:years-select' make=make model=model platform=platform body_type=body_type version=version %}">{{ make }} {{ version }}</a>
+	{% elif body_type %} for <a href="{% url 'marketplace:version-select' make=make model=model platform=platform body_type=body_type %}">{{ make }} {{ body_type }}</a>
+	{% elif platform %} for <a href="{% url 'marketplace:body-select' make=make model=model platform=platform %}">{{ make }} {{ platform }}</a>
+	{% elif model %} for <a href="{% url 'marketplace:platform-select' make=make model=model %}">{{ make }} {{model }}</a>
+	{% elif make %} for <a href="{% url 'marketplace:model-select' make %}">{{ make }}</a>	
+	{% endif %}</h2>
+
+	{% if not reviews %}
+		<div class="review"><p><i>There are no reviews for this car yet.</i></p></div>
+	{% endif %}
+
+	{% for review in reviews %}
+		<div class="review">
+			@<a href="{% url 'home:member' review.user.username %}">{{ review.user }}</a> ({{ review.created.date }})<br>
+			<h4><a href="{% url 'reviews:car' make=review.car.make years=review.car.years body_type=review.car.body_type %}">{{ review.car }}</a></h4>
+			<p><kbd>{{ review.rating }}/10</kbd> <i>{{ review.title }}</i></p>
+			{% if review.car.photo %}
+					<div id="images-feed">
+						<img src="/{{ review.car.photo }}" class="img-fluid" max-width="100%">
+					</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+
+</div>
+
+{% endblock %}

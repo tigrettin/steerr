@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Reviews | STEERR{% endblock %}
+{% block reviews_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid"><p></p>
+
+	<ul class="list-group">
+
+		{% if make %}
+			<li class="list-group-item">
+				<strong>Make:</strong> {{ make }}
+			</li>
+		{% endif %}
+
+		{% if model %}
+			<li class="list-group-item">
+				<strong>Model:</strong> {{ model }}
+			</li>
+		{% endif %}
+
+		{% if trim %}
+			<li class="list-group-item">
+				<strong>Trim:</strong> {{ trim }}
+			</li>
+		{% endif %}
+
+		{% if version %}
+			<li class="list-group-item">
+				<strong>Version:</strong> {{ version }}
+			</li>
+		{% endif %}
+
+		{% if year %}
+			<li class="list-group-item">
+				<strong>Year:</strong> {{ year }}
+			</li>
+		{% endif %}
+
+	</ul>
+
+	{% if make %}<p></p>{% endif %}
+
+	<div class="col-sm-4" style="margin-left: -15px">
+		<form action="" method="GET">
+		    <input type="hidden" name="submitted" value="1" />
+		    {{ form.as_p }}
+		    <input type="submit" class="btn btn-secondary" value="Select" />
+		</form>
+	</div><p></p>
+
+	<h2><img src="/static/reviews/images/us_flag.png" class="us_flag" style="width: 45px; top: -3px"> Latest Reviews
+	{% if version %} for <a href="{% url 'marketplace:year-select-us' make=make model=model trim=trim version=version %}">{{ make }} {{ version }}</a>
+	{% elif trim %} for <a href="{% url 'marketplace:version-select-us' make=make model=model trim=trim %}">{{ make }} {{ trim }}</a>
+	{% elif model %} for <a href="{% url 'marketplace:trim-select-us' make=make model=model %}"}">{{ make }} {{model }}</a>
+	{% elif make %} for <a href="{% url 'marketplace:model-select-us' make=make %}">{{ make }}</a>	
+	{% endif %}</h2>
+
+	{% if not reviews %}
+		<div class="review"><p><i>There are no reviews for this car yet.</i></p></div>
+	{% endif %}
+
+	{% for review in reviews %}
+		<div class="review">
+			@<a href="{% url 'home:member' review.user.username %}">{{ review.user }}</a> ({{ review.created.date }})<br>
+			<h4><a href="{% url 'reviews:car-us' make=review.car.make model=review.car.model trim=review.car.trim version=review.car.version year=review.car.year %}">{{ review.car }}</a></h4>
+			<p><kbd>{{ review.rating }}/10</kbd> <i>{{ review.title }}</i></p>
+			<div id="images-feed">
+					<img src="{{ review.car.url }}" class="img-fluid" max-width="100%">
+			</div>
+		</div>
+	{% endfor %}
+
+</div>
+
+{% endblock %}

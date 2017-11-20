@@ -5,82 +5,85 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+
 	<link href="https://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<title>{% block title %}STEERR{% endblock %}</title>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+	<title>{% block title %}STEERR | Your next car is here!{% endblock %}</title>
 </head>
 
 <body>
-<nav class="navbar navbar-inverse">
-	<div class="container-fluid">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container-fluid">
 
-		<!-- HEADER -->
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
-				<span class="glyphicon glyphicon-menu-hamburger" style="color:white"></span>
-			</button>
 			<a class="navbar-brand" href="{% url 'home:feed' %}">STEER<span style="color:orange;">R</span></a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+  			</button>
+
+  			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			    <ul class="navbar-nav mr-auto">
+			    	<li class="{% block reviews_active %}{% endblock %}">
+			    		<a class="nav-link" href="{% url 'reviews:make-select' %}">
+			    			<span class="fa fa-star" aria-hidden="true"></span> Reviews
+			    		</a>
+			      	</li>
+
+			      	<li class="{% block marketplace_active %}{% endblock %}">
+			    		<a class="nav-link" href="{% url 'marketplace:make-select' %}">
+			    			<span class="fa fa-shopping-cart" aria-hidden="true"></span> Marketplace
+			    		</a>
+			      	</li>
+
+			      	{% if user.is_superuser %}
+			      	<li class="nav-item">
+			    		<a class="nav-link" href="http://127.0.0.1:8000/admin/">
+			    			<span class="fa fa-lock" aria-hidden="true"></span> Admin
+			    		</a>
+			      	</li>
+			      	{% endif %}
+			    </ul>
+
+			    <form class="form-inline my-2 my-lg-0" role="search" method="get" action="{% url 'home:search' %}">
+			    	<input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" name="q">
+			    	<button class="btn btn-outline-warning my-2 my-sm-0" type="submit">Search</button>
+			    </form>
+
+			    <ul class="navbar-nav ml-auto">
+			    	{% if user.is_authenticated %}
+			      	<li class="nav-item dropdown">
+			        	<a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			        		<span class="fa fa-user" aria-hidden="true"></span> {{ user.username }}
+			        	</a>
+			        	<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			        		<a class="dropdown-item" href="{% url 'home:member' user.username %}">Profile</a>
+			        		<a class="dropdown-item" href="{% url 'home:logout' %}">Logout</a>
+			          	</div>
+			     	</li>
+			     	{% else %}
+			     	<li class="{% block register_active %}{% endblock %}">
+			    		<a class="nav-link" href="{% url 'home:register' %}">
+			    			<span class="fa fa-pencil-square-o" aria-hidden="true"></span> Register
+			    		</a>
+			      	</li>
+			      	{% endif %}
+			      </ul>
+			</div>
+
 		</div>
+	</nav>
 
-		<!-- ITEMS -->
-		<div class="collapse navbar-collapse" id="topNavBar">
-			
-			<ul class="nav navbar-nav">
-				<li class="{% block reviews_active %}{% endblock %}">
-					<a href="{% url 'reviews:make-select' %}">
-						<span class="glyphicon glyphicon-star" aria-hidden="true"></span> Reviews
-					</a>
-				</li>
-				<li class="{% block marketplace_active %}{% endblock %}">
-					<a href="{% url 'marketplace:make-select' %}">
-						<span class="glyphicon glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Marketplace
-					</a>
-				</li>
-				{% if user.is_superuser %}
-				<li class="">
-					<a href="http://127.0.0.1:8000/admin/">
-						<span class="glyphicon glyphicon-lock" aria-hidden="true"></span> Admin
-					</a>
-				</li>
-				{% endif %}
-			</ul>
-
-			<form class="navbar-form navbar-left" role="search" method="get" action="#">
-				<div class="form-group">
-					<input type="text" class="form-control" name="q" value="">
-				</div>
-				<button type="submit" class="btn btn-default">Search</button>
-			</form>
-
-			<ul class="nav navbar-nav navbar-right">
-				<li class="{% block register_active %}{% endblock %}">
-					{% if user.is_authenticated %}
-					<li class="dropdown">
-				        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{ user.username }}
-				        <span class="caret"></span></a>
-				        <ul class="dropdown-menu">
-				          <li><a href="{% url 'home:member' user.username %}">Profile</a></li>
-				          <li><a href="{% url 'home:logout' %}">Logout</a></li>
-				        </ul>
-				    </li>
-					{% else %}
-					<a href="{% url 'home:register' %}">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Register
-					</a>
-					{% endif %}
-				</li>
-			</ul>
-
-		</div>
-
-	</div>
-</nav>
 
 {% block body %}
 {% endblock %}
 </body>
 
 </html>
+
+

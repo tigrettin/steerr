@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Marketplace | STEERR{% endblock %}
+{% block marketplace_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid"><p></p>
+
+	{% if messages %}
+    	{% for message in messages %}
+    		<div{% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissable fade show"{% endif %}>
+ 				{{ message }}
+ 				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  					<span aria-hidden="true">&times;</span>
+  				</button>
+			</div>
+   		{% endfor %}
+	{% endif %}
+
+	{% if not user.is_authenticated %}
+		{% if car %}
+			<a href="{% url 'home:register' %}" class="btn btn-primary btn-lg"><strong>Register</strong> to sell your car!</a><p></p>
+		{% else %}
+			<ul class="list-group">
+
+				{% if make %}
+					<li class="list-group-item">
+						<strong>Make:</strong> {{ make }}
+					</li>
+				{% endif %}
+
+				{% if model %}
+					<li class="list-group-item">
+						<strong>Model:</strong> {{ model }}
+					</li>
+				{% endif %}
+
+				{% if trim %}
+					<li class="list-group-item">
+						<strong>Trim:</strong> {{ trim }}
+					</li>
+				{% endif %}
+
+				{% if version %}
+					<li class="list-group-item">
+						<strong>Version:</strong> {{ version }}
+					</li>
+				{% endif %}
+
+			</ul>
+		{% endif %}
+	{% else %}
+		{% if car %}
+			<a href="{% url 'marketplace:new-listing-us' make=car.make model=car.model trim=car.trim version=car.version year=car.year %}" class="btn btn-primary">Sell your car!</a><p></p>
+		{% else %}
+			<div class="alert alert-primary" role="alert">
+				Before <strong>selling your car</strong>, please select the following fields:
+			</div>
+			<ul class="list-group">
+
+				{% if make %}
+					<li class="list-group-item">
+						<strong>Make:</strong> {{ make }}
+					</li>
+				{% endif %}
+
+				{% if model %}
+					<li class="list-group-item">
+						<strong>Model:</strong> {{ model }}
+					</li>
+				{% endif %}
+
+				{% if trim %}
+					<li class="list-group-item">
+						<strong>Trim:</strong> {{ trim }}
+					</li>
+				{% endif %}
+
+				{% if version %}
+					<li class="list-group-item">
+						<strong>Version:</strong> {{ version }}
+					</li>
+				{% endif %}
+
+			</ul>
+		{% endif %}
+	{% endif %}
+
+	{% if car %}		
+	{% else %}
+		{% if make %}<p></p>{% endif %}
+		<div class="col-sm-4" style="margin-left: -15px">
+			<form action="" method="GET">
+			    <input type="hidden" name="submitted" value="1" />
+			    {{ form.as_p }}
+			    <input type="submit" class="btn btn-secondary" value="Select" />
+			</form>
+		</div><p></p>
+	{% endif %}
+
+	<h2><img src="/static/reviews/images/us_flag.png" class="us_flag" style="width: 45px; top: -3px"> Latest Listings
+	{% if car %} for <a href="{% url 'reviews:car-us' make=car.make model=car.model trim=car.trim version=car.version year=car.year %}">{{ car }}</a>
+	{% elif version %} for <a href="{% url 'reviews:year-select-us' make=make model=model trim=trim version=version %}">{{ make }} {{ version }}</a>
+	{% elif trim %} for <a href="{% url 'reviews:version-select-us' make=make model=model trim=trim %}">{{ make }} {{ trim }}</a>
+	{% elif model %} for <a href="{% url 'reviews:trim-select-us' make=make model=model %}">{{ make }} {{ model }}</a>
+	{% elif make %} for <a href="{% url 'reviews:model-select-us' make %}">{{ make }}{% endif %}</a></h2>
+
+	{% if not listings %}
+		<div class="listing"><p><i>There are no listings for this car yet.</i></p></div>
+	{% endif %}
+
+	{% for listing in listings %}
+		<div class="listing">
+			@<a href="{% url 'home:member' listing.user.username %}">{{ listing.user }}</a> ({{ listing.created.date }})<br>
+			<h4><a href="{% url 'marketplace:car-listing-us' make=listing.car.make model=listing.car.model trim=listing.car.trim version=listing.car.version year=listing.car.year listing_id=listing.id %}">{{ listing.title }}</a></h4>
+			<p><kbd>{{ listing.year }} {{ listing.car.make }} {{ listing.car.trim }}</kbd></p>
+			<p><span class="fa fa-road" aria-hidden="true"></span>{{ listing.mileage }} mi <span class="fa fa-usd" aria-hidden="true"></span>{{ listing.price|intcomma }}</p>
+			{% if listing.photo1 %}
+				<div id="images-feed">
+					<img src="/{{ listing.photo1 }}" class="img-fluid" max-width="100%">
+				</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+
+</div>
+
+{% endblock %}

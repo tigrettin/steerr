@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Suggest a picture for {{ car }} | STEERR{% endblock %}
+{% block reviews_active %}active{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid"><p></p>
+
+	{% if car.photo %}
+		<div class="alert alert-warning">
+  			This car has already got a picture. <a href="{% url 'reviews:car' make=car.make years=car.years body_type=car.body_type %}" class="alert-link">Visit {{ car }}'s page</a>
+		</div>
+
+	{% else %}
+		{% if already_suggested %}
+		<h1 class="car-title">{{ car }}</h1>
+
+		<div id="images">
+			<img src="/{{ already_suggested }}" class="img-fluid" max-width="100%">
+		</div><br>
+
+		<div class="alert alert-info"><strong>You have already suggested the above picture.</strong> You can change it below:</div>
+
+		<form action="" method="POST" enctype="multipart/form-data">
+			{% csrf_token %}
+			<input type="file" class="form-control" name="picture" id="id_picture" /></p>
+		    <input type="submit" class="btn btn-primary" value="Upload" />
+		</form><br>
+
+		{% else %}
+			<div class="review">
+				<h2 style="margin-top: 0">Suggest a picture for:</h2>
+				<h1 class="car-title">{{ car }}</h1>
+				<br><br><br><br>
+			
+				<p class="well well-small"><img src="/static/reviews/images/image_icon.png" class="image_icon"> Your image must be <strong>smaller than 1MB</strong> in size and <strong>larger than 1024px</strong> in width.</p>
+				<p class="well well-small"><img src="/static/reviews/images/car_logos/{% if car.make == 'Opel / Vauxhall' %}vauxhall{% else %}{{ car.make.lower }}{% endif %}.png" class="make_icon"> Please try to upload an <strong>official</strong> image provided and freely distributed by the manufacturer.</p>
+				<p class="well well-small"><img src="/static/reviews/images/copyright_icon.png" class="copyright_icon"> If not, please make sure that <strong>you own all the copyrights</strong> of the image you're uploading.</p>
+			</div>
+
+			<form action="" method="POST" enctype="multipart/form-data">
+				{% csrf_token %}
+			    {{ form.as_p }}
+			    <input type="submit" class="btn btn-primary" value="Upload" />
+			</form><br>
+		{% endif %}
+	{% endif %}
+
+</div>
+
+{% endblock %}

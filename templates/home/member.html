@@ -5,75 +5,176 @@
 {% block title %}{{ member }} | STEERR{% endblock %}
 {% block body %}
 
-<div class="container-fluid">
+<div class="container-fluid"><p></p>
+
+	{% if messages %}
+    	{% for message in messages %}
+    		<div{% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissable fade show"{% endif %}>
+  				{{ message }}
+  				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  					<span aria-hidden="true">&times;</span>
+  				</button>
+			</div>
+   		{% endfor %}
+	{% endif %}
 
 	<h1 class="member-title">{{ member }} 
 		{% if user != member and user.is_authenticated %}
 		<form action="{% url 'home:member-subscribe' member.username %}" method="GET" style="display: inline">
 	   	    {% if member.subscriptions not in user.subscriptions.members.all %}
-				<button type="submit" class="btn btn-primary btn-lg" style="background-color: green" name="subscribe"><b>Follow</b></button>
+				<button type="submit" class="btn btn-primary btn-md" style="background-color: green" name="subscribe"><b>Follow</b></button>
 		    {% else %}
-				<button type="submit" class="btn btn-primary btn-md" style="background-color: crimson" name="unsubscribe">Unfollow</button>
+				<button type="submit" class="btn btn-primary btn-sm" style="background-color: crimson" name="unsubscribe">Unfollow</button>
 		    {% endif %}
 		</form>
 		{% endif %}
+		{% if user == member or user.is_superuser %}
+			<a href="{% url 'home:member-edit' member.username %}" class="btn btn-primary btn-md" style="display: inline">Edit profile</a>
+		{% endif %}
 	</h1>
+
+	<div id="images">
+		<img src="/{{ member.profile.photo }}" class="img-fluid" style="max-width: 100%">
+	</div><br>
+
+	{% if not member.profile.photo %}
+		<br><br><p>
+	{% endif %}
 
 	{% if user == member %}
 		<form action="" method="POST" enctype="multipart/form-data">
 		<div class="form-group">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<p></p><input type="submit" class="btn btn-default" value="Post" />
+			<input type="submit" class="btn btn-secondary" value="Post" />
 		</div>
 		</form>
-	{% endif %}
-
-	{% if messages %}
-    	{% for message in messages %}
-    		<div{% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissable"{% endif %}>
-    			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
- 				{{ message }}
-			</div>
-   		{% endfor %}
 	{% endif %}
 
 	{% for content in feed reversed %}
 		{% if content in reviews %}
 			<div class="review">
-				@<a href="">{{ content.user }}</a> ({{ content.created.date }})<br>
-				<h4><a href="{% url 'car' make=content.car.make years=content.car.years %}">{{ content.car.make }} {{ content.car.version }} ({{ content.car.years_sold }})</a></h4>
+				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
+				{% if user == member or user.is_superuser %}
+					<a href="{% url 'home:content-update' username=content.user.username category='reviews' content_id=content.id %}"><button type="submit" class="fa fa-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:content-confirm' username=content.user.username category='reviews' content_id=content.id %}"><button type="submit" class="fa fa-times" style="color: crimson"></button></a>
+				{% endif %}<br>
+				<h4><a href="{% url 'reviews:car' make=content.car.make years=content.car.years body_type=content.car.body_type %}">{{ content.car }}</a></h4>
 				<p><kbd>{{ content.rating }}/10</kbd> <i>{{ content.title }}</i></p>
+				{% if content.car.photo %}
+					<div id="images-feed">
+						<img src="/{{ content.car.photo }}" class="img-fluid" max-width="100%">
+					</div>
+				{% endif %}
+			</div>
+		{% elif content in reviews_us %}
+			<div class="review">
+				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
+				{% if user == member or user.is_superuser %}
+					<a href="{% url 'home:content-update' username=content.user.username category='reviews_us' content_id=content.id %}"><button type="submit" class="fa fa-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:content-confirm' username=content.user.username category='reviews_us' content_id=content.id %}"><button type="submit" class="fa fa-times" style="color: crimson"></button></a>
+				{% endif %}<br>
+				<h4><a href="{% url 'reviews:car-us' make=content.car.make model=content.car.model trim=content.car.trim version=content.car.version year=content.car.year %}">{{ content.car }}</a></h4>
+				<p><kbd>{{ content.rating }}/10</kbd> <i>{{ content.title }}</i></p>
+				<div id="images-feed">
+					<img src="{{ content.car.url }}" class="img-fluid" max-width="100%">
+				</div>
 			</div>
 		{% elif content in listings %}
 			<div class="listing">
-				@<a href="">{{ content.user }}</a> ({{ content.created.date }})<br>
-				<h4><a href="{% url 'car-listing' make=content.car.make years=content.car.years listing_id=content.id %}">{{ content.title }}</a></h4>
-				<p><kbd>{{ content.year }} {{ content.car.make }} {{ content.car.version }}</kbd> {{ content.mileage }} km, ${{ content.price|intcomma }}</p>
-				<p></p>
+				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
+				{% if user == member or user.is_superuser %}
+					<a href="{% url 'home:content-update' username=content.user.username category='listings' content_id=content.id %}"><button type="submit" class="fa fa-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:content-confirm' username=content.user.username category='listings' content_id=content.id %}"><button type="submit" class="fa fa-times" style="color: crimson"></button></a>
+				{% endif %}<br>
+				<h4><a href="{% url 'marketplace:car-listing' make=content.car.make years=content.car.years body_type=content.car.body_type listing_id=content.id %}">{{ content.title }}</a></h4>
+				<p><kbd>{{ content.year }} {{ content.car.make }} {{ content.car.version }}</kbd></p>
+				<p><span class="fa fa-road" aria-hidden="true"></span>{{ content.mileage }} km <span class="fa fa-euro" aria-hidden="true"></span>{{ content.price|intcomma }}</p>
+				{% if content.photo1 %}
+					<div id="images-feed">
+						<img src="/{{ content.photo1 }}" class="img-fluid" max-width="100%">
+					</div>
+				{% endif %}
+			</div>
+		{% elif content in listings_us %}
+			<div class="listing">
+				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
+				{% if user == member or user.is_superuser %}
+					<a href="{% url 'home:content-update' username=content.user.username category='listings_us' content_id=content.id %}"><button type="submit" class="fa fa-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:content-confirm' username=content.user.username category='listings_us' content_id=content.id %}"><button type="submit" class="fa fa-times" style="color: crimson"></button></a>
+				{% endif %}<br>
+				<h4><a href="{% url 'marketplace:car-listing-us' make=content.car.make model=content.car.model trim=content.car.trim version=content.car.version year=content.car.year listing_id=content.id %}">{{ content.title }}</a></h4>
+				<p><kbd>{{ content.year }} {{ content.car.make }} {{ content.car.trim }}</kbd></p>
+				<p><span class="fa fa-road" aria-hidden="true"></span>{{ content.mileage }} mi <span class="fa fa-usd" aria-hidden="true"></span>{{ content.price|intcomma }}</p>
+				{% if content.photo1 %}
+					<div id="images-feed">
+						<img src="/{{ content.photo1 }}" class="img-fluid" max-width="100%">
+					</div>
+				{% endif %}
 			</div>
 		{% elif content in opinions %}
 			<div class="opinion">
 				@<a href="">{{ content.user }}</a> ({{ content.created.date }}) 
 				{% if user == member or user.is_superuser %}
-					<a href="{% url 'home:opinion-update' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-pencil"  style="color: darkorange"></button></a>
-					<a href="{% url 'home:opinion-confirm' username=content.user.username opinion_id=content.id %}"><button type="submit" class="glyphicon glyphicon-remove" style="color: crimson"></button></a>
-				{% endif %}<br>
-				<div id="images">
-					<img src="/{{ content.photo }}" class="img-responsive" style="max-width: 100%">
-				</div>
+					<a href="{% url 'home:content-update' username=content.user.username category='opinions' content_id=content.id %}"><button type="submit" class="fa fa-pencil"  style="color: darkorange"></button></a>
+					<a href="{% url 'home:content-confirm' username=content.user.username category='opinions' content_id=content.id %}"><button type="submit" class="fa fa-times" style="color: crimson"></button></a>
+				{% endif %}
+
+				{% if content.photo %}
+					<!-- Trigger the Modal -->
+					<p style="margin-top: -10px"><div id="images-feed">
+						<img id="{{ content.id }}" src="/{{ content.photo }}" class="img-fluid" alt="" max-width="100%">
+					</div></p>
+
+					<!-- The Modal -->
+					<div id="myModal" class="modal">
+
+					  <!-- The Close Button -->
+					  <span class="close-image">&times;</span>
+
+					  <!-- Modal Content (The Image) -->
+					  <img class="modal-content" id="img01">
+
+					  <!-- Modal Caption (Image Text) -->
+					  <div id="caption"></div>
+					</div>
+				{% endif %}
+
+				<script>
+					// Get the modal
+					var modal = document.getElementById('myModal');
+
+					// Get the image and insert it inside the modal - use its "alt" text as a caption
+					var img = document.getElementById('{{ content.id }}');
+					var modalImg = document.getElementById("img01");
+					var captionText = document.getElementById("caption");
+					img.onclick = function(){
+					    modal.style.display = "block";
+					    modalImg.src = this.src;
+					    captionText.innerHTML = this.alt;
+					}
+
+					// Get the <span> element that closes the modal
+					var span = document.getElementsByClassName("close-image")[0];
+
+					// When the user clicks on <span> (x), close the modal
+					span.onclick = function() { 
+					  modal.style.display = "none";
+					}
+				</script>
+
 				<p>{{ content.text|linebreaks }}</p>
 				
-				<form action="{% url 'home:opinion-vote' username=content.user.username opinion_id=content.id %}" method="GET" {% if user == content.user or not user.is_authenticated %}onclick="return false;"{% endif %}>
+				<form action="{% url 'home:content-vote' username=content.user.username category='opinions' content_id=content.id %}" method="GET" {% if user == content.user or not user.is_authenticated %}onclick="return false;"{% endif %}>
 				<input type="hidden" name="member" value="1" />
-				<div class="form-group" style="background-color: rgba(17,17,17,0.1)">
-		    		<button type="submit" class="glyphicon glyphicon-thumbs-up" name="vote-up"></button>
+				<div class="form-group" style="background-color: rgba(17,17,17,0.1); margin-bottom: 10px">
+		    		<button type="submit" class="fa fa-thumbs-up" name="vote-up"></button>
 		    		{% if content.vote_score > 0 %}
 		    			<strong style="color: green">{{ content.vote_score }}</strong>
 		    		{% elif content.vote_score < 0 %}
 		    			<strong style="color: crimson">{{ content.vote_score }}</strong>
 		    		{% endif %}
-		    		<button type="submit" class="glyphicon glyphicon-thumbs-down" name="vote-down"></button>
+		    		<button type="submit" class="fa fa-thumbs-down" name="vote-down"></button>
 		    	</div>
 				</form>
 			</div>
@@ -81,6 +182,5 @@
 	{% endfor %}
 
 </div>
-
 
 {% endblock %}
